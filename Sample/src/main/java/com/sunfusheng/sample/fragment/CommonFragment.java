@@ -31,6 +31,8 @@ public class CommonFragment extends Fragment {
     private MarqueeView marqueeView3;
     private MarqueeView marqueeView4;
 
+    private MarqueeView marqueeView5;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class CommonFragment extends Fragment {
         marqueeView2 = view.findViewById(R.id.marqueeView2);
         marqueeView3 = view.findViewById(R.id.marqueeView3);
         marqueeView4 = view.findViewById(R.id.marqueeView4);
+
+        marqueeView5 = view.findViewById(R.id.marqueeView5);
 
         List<CharSequence> list = new ArrayList<>();
         SpannableString ss1 = new SpannableString("1、MarqueeView开源项目");
@@ -59,6 +63,7 @@ public class CommonFragment extends Fragment {
         marqueeView.setOnItemClickListener((position, textView) -> Toast.makeText(getContext(), textView.getText() + "", Toast.LENGTH_SHORT).show());
 
         marqueeView1.startWithText(getString(R.string.marquee_texts), R.anim.anim_top_in, R.anim.anim_bottom_out);
+//       seachal annotation，需要自己实现MarqueeView#OnItemClickListener接口方法，相应点击事件。
         marqueeView1.setOnItemClickListener((position, textView) -> Toast.makeText(getContext(), String.valueOf(position) + ". " + textView.getText(), Toast.LENGTH_SHORT).show());
 
         marqueeView2.startWithText(getString(R.string.marquee_text));
@@ -66,6 +71,9 @@ public class CommonFragment extends Fragment {
         marqueeView3.startWithText(getString(R.string.marquee_texts));
 
         marqueeView4.startWithText(getString(R.string.marquee_texts));
+
+        marqueeView5.startWithText("心中有阳光");
+
 
         return view;
     }

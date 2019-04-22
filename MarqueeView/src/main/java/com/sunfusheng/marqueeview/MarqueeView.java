@@ -25,19 +25,24 @@ import java.util.List;
  */
 public class MarqueeView extends ViewFlipper {
 
+    //   seachal 间隔，时间间隔,两行文字翻页时间间隔
     private int interval = 3000;
+
     private boolean hasSetAnimDuration = false;
+    //   seachal 动画持续时间,一行文字动画执行时间
     private int animDuration = 1000;
     private int textSize = 14;
     private int textColor = 0xffffffff;
     private boolean singleLine = false;
     private int totalViewCount = 3;
 
+    //
     private int gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
     private static final int GRAVITY_LEFT = 0;
     private static final int GRAVITY_CENTER = 1;
     private static final int GRAVITY_RIGHT = 2;
 
+    //  seachal  Direction 方向,动画滚动方向
     private boolean hasSetDirection = false;
     private int direction = DIRECTION_BOTTOM_TO_TOP;
     private static final int DIRECTION_BOTTOM_TO_TOP = 0;
@@ -45,8 +50,10 @@ public class MarqueeView extends ViewFlipper {
     private static final int DIRECTION_RIGHT_TO_LEFT = 2;
     private static final int DIRECTION_LEFT_TO_RIGHT = 3;
 
+    // seachal 字体
     private Typeface typeface;
 
+    //    seachal 动画资源，view动画/补间动画
     @AnimRes
     private int inAnimResId = R.anim.anim_bottom_in;
     @AnimRes
@@ -54,6 +61,8 @@ public class MarqueeView extends ViewFlipper {
 
     private int position;
     private List<? extends CharSequence> notices = new ArrayList<>();
+
+    //   seachal item 监听接口
     private OnItemClickListener onItemClickListener;
 
     public MarqueeView(Context context) {
@@ -120,7 +129,9 @@ public class MarqueeView extends ViewFlipper {
             outAnimResId = R.anim.anim_top_out;
         }
 
+        //  seachal 回收利用
         typedArray.recycle();
+
         setFlipInterval(interval);
     }
 
@@ -142,10 +153,13 @@ public class MarqueeView extends ViewFlipper {
      */
     @SuppressWarnings("deprecation")
     public void startWithText(final String notice, final @AnimRes int inAnimResId, final @AnimRes int outAnimResID) {
-        if (TextUtils.isEmpty(notice)) return;
+        if (TextUtils.isEmpty(notice)) {
+            return;
+        }
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
+                //              seachal  onGlobalLayout事件内要移除监听。 removeOnGlobalLayoutListener
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 } else {
@@ -167,6 +181,7 @@ public class MarqueeView extends ViewFlipper {
         if (width == 0) {
             throw new RuntimeException("Please set the width of MarqueeView !");
         }
+        //        seachal View宽度制约的文字最大个数
         int limit = width / textSize;
         List list = new ArrayList();
 
@@ -177,13 +192,18 @@ public class MarqueeView extends ViewFlipper {
             for (int i = 0; i < size; i++) {
                 int startIndex = i * limit;
                 int endIndex = ((i + 1) * limit >= noticeLength ? noticeLength : (i + 1) * limit);
+                //                字符串长度超出View宽度，则把字符串分割成多段，每段作为一个item,通过add()方法添加到list中。
                 list.add(notice.substring(startIndex, endIndex));
             }
         }
 
-        if (notices == null) notices = new ArrayList<>();
+        //        seachal annotation 代码更严谨
+        if (notices == null) {
+            notices = new ArrayList<>();
+        }
         notices.clear();
         notices.addAll(list);
+        //        seachal 启动
         postStart(inAnimResId, outAnimResID);
     }
 
@@ -204,7 +224,8 @@ public class MarqueeView extends ViewFlipper {
      * @param outAnimResID 离开动画的resID
      */
     public void startWithList(List<? extends CharSequence> notices, @AnimRes int inAnimResId, @AnimRes int outAnimResID) {
-        if (Utils.isEmpty(notices)) return;
+        if (Utils.isEmpty(notices))
+            return;
         setNotices(notices);
         postStart(inAnimResId, outAnimResID);
     }
@@ -221,17 +242,22 @@ public class MarqueeView extends ViewFlipper {
     private boolean isAnimStart = false;
 
     private void start(final @AnimRes int inAnimResId, final @AnimRes int outAnimResID) {
+        //       seachal   下面两行作用是回收？
         removeAllViews();
         clearAnimation();
+
         // 检测数据源
         if (notices == null || notices.isEmpty()) {
             throw new RuntimeException("The data source cannot be empty!");
         }
+
+        //       先创建add 第一个view
         position = 0;
         addView(createTextView(notices.get(position)));
 
         if (notices.size() > 1) {
             setInAndOutAnimation(inAnimResId, outAnimResID);
+            //  启动计时器以循环查看子视图
             startFlipping();
         }
 
@@ -240,6 +266,7 @@ public class MarqueeView extends ViewFlipper {
                 @Override
                 public void onAnimationStart(Animation animation) {
                     if (isAnimStart) {
+                        //  seachal 取消动画。取消动画会调用动画侦听器（如果已设置）以通知动画结束。
                         animation.cancel();
                     }
                     isAnimStart = true;
@@ -252,6 +279,7 @@ public class MarqueeView extends ViewFlipper {
                         position = 0;
                     }
                     View view = createTextView(notices.get(position));
+                    //   seachal 代码严谨
                     if (view.getParent() == null) {
                         addView(view);
                     }
@@ -295,6 +323,7 @@ public class MarqueeView extends ViewFlipper {
         return textView;
     }
 
+    //    通过tag，获取到索引
     public int getPosition() {
         return (int) getCurrentView().getTag();
     }
@@ -323,11 +352,15 @@ public class MarqueeView extends ViewFlipper {
      */
     private void setInAndOutAnimation(@AnimRes int inAnimResId, @AnimRes int outAnimResID) {
         Animation inAnim = AnimationUtils.loadAnimation(getContext(), inAnimResId);
-        if (hasSetAnimDuration) inAnim.setDuration(animDuration);
+        if (hasSetAnimDuration) {
+            inAnim.setDuration(animDuration);
+        }
         setInAnimation(inAnim);
 
         Animation outAnim = AnimationUtils.loadAnimation(getContext(), outAnimResID);
-        if (hasSetAnimDuration) outAnim.setDuration(animDuration);
+        if (hasSetAnimDuration) {
+            outAnim.setDuration(animDuration);
+        }
         setOutAnimation(outAnim);
     }
 

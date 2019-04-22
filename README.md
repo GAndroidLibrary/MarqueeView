@@ -114,3 +114,33 @@
 [简书主页](http://www.jianshu.com/users/88509e7e2ed1/latest_articles)
   
 [新浪微博](http://weibo.com/u/3852192525) 
+
+## 实现原理
+ extends ViewFlipper
+ 
+```
+ * Simple {@link ViewAnimator} that will animate between two or more views
+ * that have been added to it.  Only one child is shown at a time.  If
+ * requested, can automatically flip between each child at a regular interval.
+
+ Simple{@link ViewAnimator}，它将在已添加到其中的两个或多个视图之间设置动画。一次只显示一个孩子。如果请求，可以在每个子对象之间以固定的间隔自动翻转。
+```
+
+通过
+`startWithText（）`方法外部调用，用于启动轮播。
+
+通过
+`setOnItemClickListener()`方法共外部调用，外部传入事件的相应方式，相应方式传给了ViewFlipper的子View,即TextView
+
+```
+textView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onItemClickListener != null) {
+                        onItemClickListener.onItemClick(getPosition(), (TextView) v);
+                    }
+                }
+            });
+```
+
+通过 测量计算，测量View的宽度，文字总长度，每个字的宽度，确定ViewFlipper创建字View（TextView）的个数。
